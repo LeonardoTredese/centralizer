@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ urls.bootstrap_css }}">
+  <script src="{{ urls.bootstrap_js  }}"></script>
+  <script src="{{ urls.jquery_js }}"></script>
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+    .row.content {height: 550px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+        
+    /* On small screens, set height to 'auto' for the grid */
+    @media screen and (max-width: 767px) {
+      .row.content {height: auto;} 
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse visible-xs">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">Logo</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Dashboard</a></li>
+        <li><a href="#">Age</a></li>
+        <li><a href="#">Gender</a></li>
+        <li><a href="#">Geo</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav hidden-xs">
+      <h2>Logo</h2>
+      <ul class="nav nav-pills nav-stacked">
+        <li class="active"><a href="#section1">Dashboard</a></li>
+        <li><a href="#section2">Age</a></li>
+        <li><a href="#section3">Gender</a></li>
+        <li><a href="#section3">Geo</a></li>
+      </ul><br>
+    </div>
+    <br>
+    
+     <div class="col-sm-9" id="content">
+     {% for machine in machines %}
+	  <div class="well">
+        <h4>Host</h4>
+        <p>Cpu: {{ machine.sys.cpu }}</p>
+		<div class="progress">
+		  <div class="progress-bar bg-success" role="progressbar" style="width: {{ machine.sys.cpu }}%" aria-valuenow="25"  aria-valuemin="0" aria-valuemax="100"></div>
+		   </div>
+		<p>Mem: {{ machine.sys.mem.percent }}</p>
+		<div class="progress">
+  		  <div class="progress-bar bg-info" role="progressbar" style="width: {{ machine.sys.mem.percent }}%" aria-valuenow="25" {{ machine.sys.mem.percent }} aria-valuemin="0" aria-valuemax="100"></div>
+  		  </div>
+      </div>
+      <div class="row" value="">
+      {% for ioc in machine.iocs.response %}
+        <div class="col-sm-3 ioc">
+          <div class="well">
+            <h4>{{ ioc.name }}</h4>
+			<p>status: <b>{{ ioc.status }}</b></p>
+			<p>procServ: {{ ioc.active }}</p>
+            <p>.service file: {{ ioc.load }}</p>
+	   		<button type="button" class="btn start-stop"></button>
+			<a href="http://10.6.0.41:5000/start/{{ ioc.name }}"><button type="button" class="btn btn-success">start</button></a>
+		  </div>
+        </div>
+      {% endfor %}
+	  </div>
+    {% endfor %}
+	</div>
+  </div>
+</div>
+
+</body>
+</html>
+
