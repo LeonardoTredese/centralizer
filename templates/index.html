@@ -24,18 +24,40 @@
 	  </style>
 	  <script>
 	  $(document).ready(function(){
-	  	$('.start-stop').click(function(){
-			$(this).hide()
-			var load_response = (function(data, status){
-					 $(this).siblings('p').children('.status').text(data.status)
-					 $(this).siblings('p').children('.proc-serv').text(data.active)
-					 $(this).siblings('p').children('.proc-serv-file').text(data.load)
-				}).bind(this)		
-			$.get(['http:/', $(this).attr('remote-socket'), $(this).text(), $(this).attr('ioc-name')].join('/'), load_response)
-			$(this).text($(this).text()=='start'?'stop':'start').toggleClass('btn-success btn-danger')
-.show()
+		var load_sys_response = function(data, status){
+			$(this).children('.cpu').text(['CPU:', data.cpu, '%'].join(''))
+			$(this).children('.mem').text(['MEM:', data.mem.percent, '%'].join(''))
+			$(this).children('.progress').children('.progress-cpu').css('width', data.cpu+'%')
+			$(this).children('.progress').children('.progress-mem').css('width', data.mem.percent+'%')
+		}
+
+		var load_ioc_response = function(data, status){
+					 $(this).children('p').children('.status').text(data.status)
+					 $(this).children('p').children('.proc-serv').text(data.active)
+					 $(this).children('p').children('.proc-serv-file').text(data.load)
+					 if(data.status == 'dead')
+					 	$(this).children('button').addClass('btn-success').removeClass('btn-danger').text('start')
+					 else
+					 	$(this).children('button').removeClass('btn-success').addClass('btn-danger').text('stop')
+				}
+	  	
+		$('.start-stop').click(function(){
+			$.get(['http:/', $(this).parent().attr('remote-socket'), $(this).text(), $(this).parent().attr('ioc-name')].join('/'),
+			       load_ioc_response.bind($(this).parent()))
 		 })
-		 $('p').click(function(){$(this).hide})
+		function poll(){
+			$('.sys').each(function(){
+				 $.get(['http:/', $(this).attr('remote-socket'),'sys'].join('/'),
+			                    load_sys_response.bind($(this)))
+			})
+			$('.ioc').each(function(){
+			
+			})
+			setTimeout(poll, 5000)
+		}
+
+		poll()
+
 	   })
 	  </script>
 	</head>
@@ -77,29 +99,29 @@
 		
 	<div class="col-sm-9" id="content">
 	    {% for machine in machines %}
-		<div class="well">
+		<div class="well sys" remote-socket="{{ machine.remote_socket }}">
 		  <h4>Host </h4>
-          <p>Cpu: {{ machine.sys.cpu }} %</p>
+          <p class="cpu">Cpu: {{ machine.sys.cpu }} %</p>
 		  <div class="progress">
-		    <div class="progress-bar bg-success" role="progressbar" style="width: {{ machine.sys.cpu }}%" aria-valuenow="25"  aria-valuemin="0" aria-valuemax="100"></div>
+		    <div class="progress-bar progress-cpu bg-success" role="progressbar" style="width: {{ machine.sys.cpu }}%" aria-valuenow="25"  aria-valuemin="0" aria-valuemax="100"></div>
 		    </div>
-		  <p>Mem: {{ machine.sys.mem.percent }} %</p>
+		  <p class="mem">Mem: {{ machine.sys.mem.percent }} %</p>
 		  <div class="progress">
-  		    <div class="progress-bar bg-info" role="progressbar" style="width: {{ machine.sys.mem.percent }}%" aria-valuenow="25" {{ machine.sys.mem.percent }} aria-valuemin="0" aria-valuemax="100"></div>
+  		    <div class="progress-bar progress-mem bg-info" role="progressbar" style="width: {{ machine.sys.mem.percent }}%" aria-valuenow="25" {{ machine.sys.mem.percent }} aria-valuemin="0" aria-valuemax="100"></div>
   		  </div>
       </div>
       <div class="row" value="">
       {% for ioc in machine.iocs.response %}
         <div class="col-sm-3 ioc">
-          <div class="well">
-            <h4 class="ioc-name">{{ ioc.name }}</h4>
+          <div class="well ioc" ioc-name="{{ ioc.name }}" remote-socket="{{ machine.remote_socket }}">
+            <h4>{{ ioc.name }}</h4>
 			<p>status: <b class="status">{{ ioc.status }}</b></p>
 			<p>procServ: <b class="proc-serv">{{ ioc.active }}</b></p>
-            <p>.service file:<b class="proc-serv-file">{{ ioc.load }}</b></p>
+            <p>.service file: <b class="proc-serv-file">{{ ioc.load }}</b></p>
 	   		{% if ioc.status == 'running' %}
-				<button type="button" ioc-name="{{ ioc.name }}" remote-socket="{{ machine.remote_socket }}" class="btn btn-danger start-stop">stop</button>
+				<button type="button" class="btn btn-danger start-stop">stop</button>
 		  	{% else %}
-				<button type="button" ioc-name="{{ ioc.name }}" remote-socket="{{ machine.remote_socket }}" class="btn btn-success start-stop">start</button>
+				<button type="button" class="btn btn-success start-stop">start</button>
 			{% endif %}
 		  </div>
         </div>
