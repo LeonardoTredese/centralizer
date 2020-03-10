@@ -11,7 +11,7 @@ def hello():
 	for remote in remotes_list:
 		sys_info = json.loads(req.get('/'.join(['http:/',remote,'sys'])).text)
 		iocs_info = json.loads(req.get('/'.join(['http:/',remote,'list'])).text)
-		m.append({'sys': sys_info, "iocs": iocs_info})
+		m.append({'sys': sys_info, "iocs": iocs_info, 'remote_socket': remote})
 	u = {
 		"bootstrap_css": url_for('static', filename="bootstrap.min.css"),
 		"bootstrap_js": url_for('static', filename="bootstrap.min.js"),
