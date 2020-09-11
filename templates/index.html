@@ -53,10 +53,9 @@
 			$('.ioc').each(function(){
 			
 			})
-			setTimeout(poll, 5000)
 		}
 
-		poll()
+		setInterval(poll,5000)
 
 	   })
 	  </script>
@@ -100,8 +99,8 @@
 	<div class="col-sm-9" id="content">
 	    {% for machine in machines %}
 		<div class="well sys" remote-socket="{{ machine.remote_socket }}">
-		  <h4>Host </h4>
-          <p class="cpu">Cpu: {{ machine.sys.cpu }} %</p>
+			<h4>Host {{ machine.remote_socket }} </h4>
+          		<p class="cpu">Cpu: {{ machine.sys.cpu }} %</p>
 		  <div class="progress">
 		    <div class="progress-bar progress-cpu bg-success" role="progressbar" style="width: {{ machine.sys.cpu }}%" aria-valuenow="25"  aria-valuemin="0" aria-valuemax="100"></div>
 		    </div>
