@@ -1,29 +1,37 @@
 #!/usr/bin/python3
 from flask import Flask, render_template, url_for
-import json 
-import requests as req
-import remote
+from remote import Remote
 
 app=Flask(__name__)
-remotes_list= ['192.168.122.42:5000']
-remotes= r
+remotes_list = [
+               ('10.6.0.41', 'training', 'e3password'),
+			   ('10.6.0.75', 'root', 'e3password')
+			  ]
+remotes_list = { arg[0]:Remote(*arg) for arg in remotes_list}
 
 @app.route('/')
 def hello():
-    m = []
-    for remote in remotes_list:
-        try:
-            sys_info = json.loads(req.get('/'.join(['http:/',remote,'sys'])).text)
-            iocs_info = json.loads(req.get('/'.join(['http:/',remote,'list'])).text)
-            m.append({'sys': sys_info, "iocs": iocs_info, 'remote_socket': remote})
-        except req.exceptions.ConnectionError:
-            print("YO! could not connect to:" + remote)
-    u = {
-            "bootstrap_css": url_for('static', filename="bootstrap.min.css"),
-	    "bootstrap_js": url_for('static', filename="bootstrap.min.js"),
-	    "jquery_js": url_for('static', filename="jquery.min.js"),
-    }
-    return render_template('index.html', machines=m, urls=u)
+	return {'remotes': list(remotes_list.keys())}
+
+@app.route('/<remote_host>/<service_name>/start')
+def start_service(remote_host, service_name):
+	return { service_name: remotes_list[remote_host].start_service(service_name)}
+
+@app.route('/<remote_host>/<service_name>/stop')
+def stop_service(remote_host, service_name):
+	return { service_name: remotes_list[remote_host].stop_service(service_name)}
+
+@app.route('/<remote_host>/<service_name>/status')
+def status_service(remote_host, service_name):
+	return { service_name: remotes_list[remote_host].status_service(service_name)}
+
+@app.route('/<remote_host>/list')
+def list_remote_services(remote_host):
+	return { 'services': list(remotes_list[remote_host].services.keys())}
+
+@app.route('/<remote_host>/sys')
+def system_remote_info(remote_host):
+	return remotes_list[remote_host].stats()
 
 if __name__ == '__main__':
     app.run()

@@ -19,7 +19,7 @@ class Remote:
 	
 	def getpodman(self):
 		return {line.split()[-1]:PodmanService(line.split()[-1]) for line in self.client.command('podman ps -a').splitlines()[1:]}
-		
+
 	def getallstatuses(self):
 		for name, service in self.services.items():
 			print(':'.join([name, service.status(self.client)]));
@@ -40,3 +40,8 @@ class Remote:
 	
 	def status_service(self, name):
 		return self.services[name].status(self.client)
+	
+	def stats(self):
+		out = self.client.command('vmstat -S M').splitlines()[-1].split()
+		return {'cpu': out[-5], 'freemem': out[3] }
+
