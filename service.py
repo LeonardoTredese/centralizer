@@ -44,5 +44,5 @@ class ProcserverService(Service):
         return Service.execute(client,'manage-procs --system stop ' + self.name) is ''
 
     def status(self, client):
-        return Service.execute(client,'manage-procs --system status | grep ' + self.name)
+        return Service.execute(client,'manage-procs --system status | grep ' + self.name).split()[1]
  
