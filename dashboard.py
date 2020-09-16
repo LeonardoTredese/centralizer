@@ -2,9 +2,11 @@
 from flask import Flask, render_template, url_for
 import json 
 import requests as req
+import remote
 
 app=Flask(__name__)
 remotes_list= ['192.168.122.42:5000']
+remotes= r
 
 @app.route('/')
 def hello():
