@@ -4,9 +4,10 @@
 	  <title>Bootstrap Example</title>
 	  <meta charset="utf-8">
 	  <meta name="viewport" content="width=device-width, initial-scale=1">
-	  <link rel="stylesheet" href="{{ urls.bootstrap_css }}">
-	  <script src="{{ urls.jquery_js }}"></script>
-	  <script src="{{ urls.bootstrap_js  }}"></script>
+	  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+	  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	  <style>
 		/* Set height of the grid so .sidenav can be 100% (adjust as needed) */
 		.row.content {height: 550px}
@@ -26,32 +27,26 @@
 	  $(document).ready(function(){
 		var load_sys_response = function(data, status){
 			$(this).children('.cpu').text(['CPU:', data.cpu, '%'].join(''))
-			$(this).children('.mem').text(['MEM:', data.mem.percent, '%'].join(''))
+			$(this).children('.mem').text(['FREE MEM:', data.freemem, ' MB'].join(''))
 			$(this).children('.progress').children('.progress-cpu').css('width', data.cpu+'%')
-			$(this).children('.progress').children('.progress-mem').css('width', data.mem.percent+'%')
 		}
 
-		var load_ioc_response = function(data, status){
+		var load_service_status = function(data, status){
 					 $(this).children('p').children('.status').text(data.status)
-					 $(this).children('p').children('.proc-serv').text(data.active)
-					 $(this).children('p').children('.proc-serv-file').text(data.load)
-					 if(data.status == 'dead')
-					 	$(this).children('button').addClass('btn-success').removeClass('btn-danger').text('start')
-					 else
-					 	$(this).children('button').removeClass('btn-success').addClass('btn-danger').text('stop')
 				}
 	  	
-		$('.start-stop').click(function(){
-			$.get(['http:/', $(this).parent().attr('remote-socket'), $(this).text(), $(this).parent().attr('ioc-name')].join('/'),
-			       load_ioc_response.bind($(this).parent()))
+	   	$('.start-stop').click(function(){
+			$.get(['http://127.0.0.1:5000', $(this).parent().attr('hostname'),  $(this).parent().attr('servicename'), $(this).text()].join('/'))
 		 })
+		
 		function poll(){
 			$('.sys').each(function(){
-				 $.get(['http:/', $(this).attr('remote-socket'),'sys'].join('/'),
+				 $.get(['http://127.0.0.1:5000', $(this).attr('hostname'),'sys'].join('/'),
 			                    load_sys_response.bind($(this)))
 			})
-			$('.ioc').each(function(){
-			
+			$('.service').each(function(){
+		 		$.get(['http://127.0.0.1:5000', $(this).attr('hostname'),  $(this).attr('servicename'), 'status'].join('/'),
+			       load_service_status.bind($(this)))
 			})
 		}
 
@@ -75,9 +70,9 @@
 		<div class="collapse navbar-collapse" id="myNavbar">
 		  <ul class="nav navbar-nav">
 			<li class="active"><a href="#">Dashboard</a></li>
-			<li><a href="#">Age</a></li>
-			<li><a href="#">Gender</a></li>
-			<li><a href="#">Geo</a></li>
+			<li><a href="#">pippo</a></li>
+			<li><a href="#">pluto</a></li>
+			<li><a href="#">paperino</a></li>
 		  </ul>
 		</div>
 	  </div>
@@ -89,39 +84,31 @@
 		  <h2>Logo</h2>
 		  <ul class="nav nav-pills nav-stacked">
 			<li class="active"><a href="#section1">Dashboard</a></li>
-			<li><a href="#section2">Age</a></li>
-			<li><a href="#section3">Gender</a></li>
-			<li><a href="#section3">Geo</a></li>
+			<li><a href="#section2">pippo</a></li>
+			<li><a href="#section3">pluto</a></li>
+			<li><a href="#section3">paperino</a></li>
 		  </ul><br>
 		</div>
 		<br>
 		
 	<div class="col-sm-9" id="content">
-	    {% for machine in machines %}
-		<div class="well sys" remote-socket="{{ machine.remote_socket }}">
-			<h4>Host {{ machine.remote_socket }} </h4>
-          		<p class="cpu">Cpu: {{ machine.sys.cpu }} %</p>
+	    {% for hostname, services in machines.items() %}
+		<div class="well sys" hostname="{{ hostname }}">
+			     <h4>Host {{ hostname }} </h4>
+          		<p class="cpu">Cpu: </p>
 		  <div class="progress">
-		    <div class="progress-bar progress-cpu bg-success" role="progressbar" style="width: {{ machine.sys.cpu }}%" aria-valuenow="25"  aria-valuemin="0" aria-valuemax="100"></div>
+		    <div class="progress-bar progress-cpu bg-success" role="progressbar" style="width: 50%" aria-valuenow="25"  aria-valuemin="0" aria-valuemax="100"></div>
 		    </div>
-		  <p class="mem">Mem: {{ machine.sys.mem.percent }} %</p>
-		  <div class="progress">
-  		    <div class="progress-bar progress-mem bg-info" role="progressbar" style="width: {{ machine.sys.mem.percent }}%" aria-valuenow="25" {{ machine.sys.mem.percent }} aria-valuemin="0" aria-valuemax="100"></div>
-  		  </div>
+		  <p class="mem">Mem: </p>
       </div>
-      <div class="row" value="">
-      {% for ioc in machine.iocs.response %}
-        <div class="col-sm-3 ioc">
-          <div class="well ioc" ioc-name="{{ ioc.name }}" remote-socket="{{ machine.remote_socket }}">
-            <h4>{{ ioc.name }}</h4>
-			<p>status: <b class="status">{{ ioc.status }}</b></p>
-			<p>procServ: <b class="proc-serv">{{ ioc.active }}</b></p>
-            <p>.service file: <b class="proc-serv-file">{{ ioc.load }}</b></p>
-	   		{% if ioc.status == 'running' %}
-				<button type="button" class="btn btn-danger start-stop">stop</button>
-		  	{% else %}
-				<button type="button" class="btn btn-success start-stop">start</button>
-			{% endif %}
+      <div class="row">
+      {% for service in services %}
+        <div class="col-sm-3">
+          <div class="well service" hostname="{{ hostname }}" servicename="{{ service }}">
+            <h4>{{ service }}</h4>
+			<p>status: <b class="status"></b></p>
+			<button type="button" class="btn btn-danger start-stop">stop</button>
+			<button type="button" class="btn btn-success start-stop">start</button>
 		  </div>
         </div>
       {% endfor %}
