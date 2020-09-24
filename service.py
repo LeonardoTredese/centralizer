@@ -24,8 +24,7 @@ class PodmanService(Service):
 		return len(out) is 64
 
 	def status(self, remote):
-		#if a container name is the prefix of another container name it will return both of them  
-		return remote.execute('podman ps -a --format "{{.Status}}" -f name=' + self.name)
+		return remote.execute('podman ps -a --format "{{.Status}}" --sort names -f name=' + self.name).splitlines()[0]
 
 class ProcserverService(Service):
     def start(self, remote):
