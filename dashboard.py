@@ -34,4 +34,4 @@ def system_remote_info(remote_host):
 	return remotes_list[remote_host].stats()
 
 if __name__ == '__main__':
-    app.run(threaded=False)
+    app.run()

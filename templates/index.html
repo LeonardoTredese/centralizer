@@ -25,6 +25,9 @@
 	  </style>
 	  <script>
 	  $(document).ready(function(){
+		
+		var api_base_url = 'http://127.0.0.1:5000'
+		
 		var load_sys_response = function(data, status){
 			$(this).children('.cpu').text(['CPU:', data.cpu, '%'].join(''))
 			$(this).children('.mem').text(['FREE MEM:', data.freemem, ' MB'].join(''))
@@ -36,16 +39,16 @@
 				}
 	  	
 	   	$('.start-stop').click(function(){
-			$.get(['http://127.0.0.1:5000', $(this).parent().attr('hostname'),  $(this).parent().attr('servicename'), $(this).text()].join('/'))
+			$.get([api_base_url, $(this).parent().attr('hostname'),  $(this).parent().attr('servicename'), $(this).text()].join('/'))
 		 })
 		
 		function poll(){
 			$('.sys').each(function(){
-				 $.get(['http://127.0.0.1:5000', $(this).attr('hostname'),'sys'].join('/'),
+				 $.get([api_base_url, $(this).attr('id'),'sys'].join('/'),
 			                    load_sys_response.bind($(this)))
 			})
 			$('.service').each(function(){
-		 		$.get(['http://127.0.0.1:5000', $(this).attr('hostname'),  $(this).attr('servicename'), 'status'].join('/'),
+		 		$.get([api_base_url, $(this).attr('hostname'),  $(this).attr('servicename'), 'status'].join('/'),
 			       load_service_status.bind($(this)))
 			})
 		}
@@ -56,68 +59,64 @@
 	  </script>
 	</head>
 	<body>
-
-	<nav class="navbar navbar-inverse visible-xs">
-	  <div class="container-fluid">
-		<div class="navbar-header">
-		  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>                        
-		  </button>
-		  <a class="navbar-brand" href="#">Logo</a>
-		</div>
-		<div class="collapse navbar-collapse" id="myNavbar">
-		  <ul class="nav navbar-nav">
-			<li class="active"><a href="#">Dashboard</a></li>
-			<li><a href="#">pippo</a></li>
-			<li><a href="#">pluto</a></li>
-			<li><a href="#">paperino</a></li>
-		  </ul>
-		</div>
-	  </div>
-	</nav>
-
-	<div class="container-fluid">
-	  <div class="row content">
-		<div class="col-sm-3 sidenav hidden-xs">
-		  <h2>Logo</h2>
-		  <ul class="nav nav-pills nav-stacked">
-			<li class="active"><a href="#section1">Dashboard</a></li>
-			<li><a href="#section2">pippo</a></li>
-			<li><a href="#section3">pluto</a></li>
-			<li><a href="#section3">paperino</a></li>
-		  </ul><br>
-		</div>
-		<br>
-		
-	<div class="col-sm-9" id="content">
-	    {% for hostname, services in machines.items() %}
-		<div class="well sys" hostname="{{ hostname }}">
-			     <h4>Host {{ hostname }} </h4>
-          		<p class="cpu">Cpu: </p>
-		  <div class="progress">
-		    <div class="progress-bar progress-cpu bg-success" role="progressbar" style="width: 50%" aria-valuenow="25"  aria-valuemin="0" aria-valuemax="100"></div>
-		    </div>
-		  <p class="mem">Mem: </p>
-      </div>
-      <div class="row">
-      {% for service in services %}
-        <div class="col-sm-3">
-          <div class="well service" hostname="{{ hostname }}" servicename="{{ service }}">
-            <h4>{{ service }}</h4>
-			<p>status: <b class="status"></b></p>
-			<button type="button" class="btn btn-danger start-stop">stop</button>
-			<button type="button" class="btn btn-success start-stop">start</button>
+		<nav class="navbar navbar-inverse visible-xs">
+		  <div class="container-fluid">
+			<div class="navbar-header">
+			  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>                        
+			  </button>
+			  <a class="navbar-brand" href="#">Hosts</a>
+			</div>
+			<div class="collapse navbar-collapse" id="myNavbar">
+			  <ul class="nav navbar-nav">
+				{% for host in machines %}
+					<li><a href="#{{ host }}">{{ host }}</a></li>
+				{% endfor %}
+			  </ul>
+			</div>
 		  </div>
-        </div>
-      {% endfor %}
-	  </div>
-    {% endfor %}
-	</div>
-  </div>
-</div>
-
-</body>
+		</nav>
+	
+		<div class="container-fluid">
+			<div class="row content">
+				<div class="col-sm-3 sidenav hidden-xs">
+			  		<h2>Hosts</h2>
+			  		<ul class="nav nav-pills nav-stacked">
+					{% for host in machines %}
+						<li><a href="#{{ host }}">{{ host }}</a></li>
+			  		{% endfor %}
+					</ul><br>
+				</div><br>
+				<div class="col-sm-9" id="content">
+				{% for hostname, services in machines.items() %}
+					<div class="well sys" id="{{ hostname }}">
+						    <h4>Host {{ hostname }} </h4>
+			          		<p class="cpu">Cpu: </p>
+					  		<div class="progress">
+					    		<div class="progress-bar progress-cpu bg-success" role="progressbar" style="width: 50%" aria-valuenow="25"  aria-valuemin="0" aria-valuemax="100"></div>
+					    	</div>
+					  		<p class="mem">Mem: </p>
+			      	</div>
+			      	<div class="row">
+			      	{% for service in services %}
+			        	<div class="col-sm-3">
+			          		<div class="well service" hostname="{{ hostname }}" servicename="{{ service }}">
+			            		<h4>{{ service }}</h4>
+								<p>status: 
+									<b class="status"></b>
+								</p>
+								<button type="button" class="btn btn-danger start-stop">stop</button>
+								<button type="button" class="btn btn-success start-stop">start</button>
+					  		</div>
+			        	</div>
+			      	{% endfor %}
+				  	</div>
+			    {% endfor %}
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
 
