@@ -1,15 +1,18 @@
 class Service:
-    def __init__(self, name):
-        self.name= name
+	def __init__(self, name):
+		self.name= name
     
-    def start(self, remote):
-        pass
+	def start(self, remote):
+		pass
 
-    def stop(self, remote):
-         pass
+	def stop(self, remote):
+		pass
 
-    def status(self, remote):
-        pass
+	def status(self, remote):
+		pass
+
+	def out(self, remote):
+		pass
 
 class PodmanService(Service):
 	def start(self, remote):

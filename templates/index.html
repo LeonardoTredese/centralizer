@@ -40,7 +40,12 @@
 	  	
 	   	$('.start-stop').click(function(){
 			$.get([api_base_url, $(this).parent().attr('hostname'),  $(this).parent().attr('servicename'), $(this).text()].join('/'))
-		 })
+		})
+	
+		$('.reconnect').click(function(){
+			$('.reconnect').css("pointer-events","none").children('a').text("RECONNETING...")
+			$.get([api_base_url, 'reconnect'].join('/'), function(){$('.reconnect').css("pointer-events","auto").children('a').text("Reconnect")})	
+		})
 		
 		function poll(){
 			$('.sys').each(function(){
@@ -53,7 +58,7 @@
 			})
 		}
 
-		setInterval(poll,5000)
+		setInterval(poll,3000)
 
 	   })
 	  </script>
@@ -71,6 +76,7 @@
 			</div>
 			<div class="collapse navbar-collapse" id="myNavbar">
 			  <ul class="nav navbar-nav">
+			  		<li class="active reconnect"><a>Reconnect</a></li>
 				{% for host in machines %}
 					<li><a href="#{{ host }}">{{ host }}</a></li>
 				{% endfor %}
@@ -84,6 +90,7 @@
 				<div class="col-sm-3 sidenav hidden-xs">
 			  		<h2>Hosts</h2>
 			  		<ul class="nav nav-pills nav-stacked">
+				  		<li class="active reconnect"> <a>Reconnect</a></li>
 					{% for host in machines %}
 						<li><a href="#{{ host }}">{{ host }}</a></li>
 			  		{% endfor %}
