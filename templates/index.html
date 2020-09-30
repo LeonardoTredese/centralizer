@@ -43,8 +43,8 @@
 		})
 	
 		$('.reconnect').click(function(){
-			$('.reconnect').css("pointer-events","none").children('a').text("RECONNETING...")
-			$.get([api_base_url, 'reconnect'].join('/'), function(){$('.reconnect').css("pointer-events","auto").children('a').text("Reconnect")})	
+			$(this).css("pointer-events","none").text("RECONNETING...")
+			$.get([api_base_url,$(this).parent().attr('id'),'reconnect'].join('/'), function(){$(this).css("pointer-events","auto").text("Reconnect")}.bind($(this)))	
 		})
 		
 		function poll(){
@@ -76,7 +76,6 @@
 			</div>
 			<div class="collapse navbar-collapse" id="myNavbar">
 			  <ul class="nav navbar-nav">
-			  		<li class="active reconnect"><a>Reconnect</a></li>
 				{% for host in machines %}
 					<li><a href="#{{ host }}">{{ host }}</a></li>
 				{% endfor %}
@@ -90,7 +89,6 @@
 				<div class="col-sm-3 sidenav hidden-xs">
 			  		<h2>Hosts</h2>
 			  		<ul class="nav nav-pills nav-stacked">
-				  		<li class="active reconnect"> <a>Reconnect</a></li>
 					{% for host in machines %}
 						<li><a href="#{{ host }}">{{ host }}</a></li>
 			  		{% endfor %}
@@ -100,6 +98,7 @@
 				{% for hostname, services in machines.items() %}
 					<div class="well sys" id="{{ hostname }}">
 						    <h4>Host {{ hostname }} </h4>
+							<button type="button" class="btn btn-info reconnect">Reconnect</button>
 			          		<p class="cpu">Cpu: </p>
 					  		<div class="progress">
 					    		<div class="progress-bar progress-cpu bg-success" role="progressbar" style="width: 50%" aria-valuenow="25"  aria-valuemin="0" aria-valuemax="100"></div>

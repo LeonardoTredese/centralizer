@@ -30,9 +30,13 @@ class Remote:
 
 	def getprocserver(self):
 		'''This method returns a list with the names of the processes within the procserver manage-procs util'''
+		if not self.check_command('manage-procs'):
+			return {}
 		return { name : ProcserverService(name) for name in re.findall('procserv-(.+?).service', self.execute('manage-procs --system list --all')) }
 	
 	def getpodman(self):
+		if not self.check_command('podman'):
+			return {}
 		return { line.split()[-1] : PodmanService(line.split()[-1]) for line in self.execute('podman ps -a').splitlines()[1:] }
 
 	def start_service(self, name):
@@ -51,13 +55,13 @@ class Remote:
 	def connect(self):
 		self.login(self.user, self.passw)
 		self.services = {**self.getpodman(), **self.getprocserver()}
-	
+
+	def check_command(self, command):
+		return self.execute('whereis ' + command) != command + ':'
 	
 	def login(self, username, password):
 		self.lock.acquire()
 		self.client.exit()
 		self.client = RedExpect()
 		self.client.login(hostname= self.host, username= username, password= password)
-		if username is not 'root':
-			self.client.sudo(password)
 		self.lock.release()

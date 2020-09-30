@@ -31,11 +31,11 @@ class PodmanService(Service):
 
 class ProcserverService(Service):
     def start(self, remote):
-        return remote.execute('manage-procs --system start ' + self.name) is ''
+        return remote.execute('manage-procs start ' + self.name) is ''
 
     def stop(self, remote):
-        return remote.execute('manage-procs --system stop ' + self.name) is ''
+        return remote.execute('manage-procs stop ' + self.name) is ''
 
     def status(self, remote):
-        return remote.execute('manage-procs --system status | grep ' + self.name).split()[1]
+        return remote.execute('manage-procs status | grep ' + self.name).split()[1]
  

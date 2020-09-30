@@ -5,11 +5,9 @@ from remote import Remote
 app=Flask(__name__)
 app.secret_key = b'\xdb\x89\x11\xcb\x1e\x1f\x01#_\xff6\xa4\xb9\x1a-\x03'
 
-@app.route('/reconnect')
-def reconnect():
-	print('##################################')
-	for args in remote_hosts_args:
-		remote_hosts[args[0]].connect()
+@app.route('/<remote_host>/reconnect')
+def reconnect(remote_host):
+	remote_hosts[remote_host].connect()
 	return 'reconnected'
 
 @app.route('/')
@@ -49,12 +47,14 @@ def system_remote_info(remote_host):
 		return ''
 
 remote_hosts_args = [
-               ('10.6.0.41', 'training', 'e3password'),
-			   ('10.6.0.75', 'root', 'e3password')
+				('127.0.0.1','leonardo','')
+#              ('10.6.0.41', 'training', 'e3password'),
+# 			   ('10.6.0.75', 'root', 'e3password')
 			   ]
 remote_hosts = { arg[0]:Remote(*arg) for arg in remote_hosts_args }
 
-reconnect()
+for host in remote_hosts:
+	reconnect(host)
 
 if __name__ == '__main__':
     app.run()
