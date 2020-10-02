@@ -18,26 +18,14 @@ def index():
 def remotes():
 	return { host_name : list(remote.services.keys()) for host_name, remote in remote_hosts.items()}
 
-@app.route('/<remote_host>/<service_name>/start')
-def start_service(remote_host, service_name):
-	try:
-		return { 'start' : remote_hosts[remote_host].start_service(service_name)}
-	except BaseException:
-		return ''
-
-@app.route('/<remote_host>/<service_name>/stop')
-def stop_service(remote_host, service_name):
-	try:
-		return { 'stop' : remote_hosts[remote_host].stop_service(service_name)}
-	except BaseException:
-		return ''
-
-@app.route('/<remote_host>/<service_name>/status')
-def status_service(remote_host, service_name):
-	try:	
-		return { 'status' : remote_hosts[remote_host].status_service(service_name)}
-	except BaseException:
-		return ''
+@app.route('/<remote_host>/<service_name>/<command>')
+def command(remote_host, service_name, command):
+	if command  in ['start', 'stop', 'status']:
+		try:
+			return { command : remote_hosts[remote_host].interact(service_name,command)}
+		except BaseException as e:
+			print(e)
+	return { command : False}
 
 @app.route('/<remote_host>/sys')
 def system_remote_info(remote_host):
@@ -47,9 +35,9 @@ def system_remote_info(remote_host):
 		return ''
 
 remote_hosts_args = [
-				('127.0.0.1','leonardo','')
-#              ('10.6.0.41', 'training', 'e3password'),
-# 			   ('10.6.0.75', 'root', 'e3password')
+##				('127.0.0.1','leonardo','', False)
+               ('10.6.0.41', 'training', 'e3password', True),
+ 			   ('10.6.0.75', 'root', 'e3password', False)
 			   ]
 remote_hosts = { arg[0]:Remote(*arg) for arg in remote_hosts_args }
 
