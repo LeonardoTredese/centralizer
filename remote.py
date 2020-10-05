@@ -1,4 +1,5 @@
 import re
+import time
 from redexpect            import RedExpect
 from redexpect.exceptions import ExpectTimeout 
 from service              import PodmanService, ProcserverService
@@ -20,13 +21,32 @@ class Remote:
 	def execute(self, command):
 		# prevent race conditions
 		self.lock.acquire()
-		out = self.client.command(command, timeout=30)
-		self.lock.release()
+		self.flush()
+		try:
+			out = self.client.command(command, timeout=5)
+		finally:
+			self.lock.release()
 		# delete carriage returns from command in prompt 
 		for i in range(len(command)//60, 0, -1):
 			out = out[:i*60] +  out[i*60+1:]
 		out = out.replace(command+'\n','').strip()
 		return out 
+
+	def shell_read(self, shell_command, stop_command='\x04', encoding='UTF-8', max_chars=1000):
+		self.lock.acquire()
+		self.client.send(shell_command+'\n')
+		previous_encoding, self.client.encoding = self.client.encoding, encoding
+		time.sleep(.1)
+		out = str()
+		for packet in self.client.read():
+			out += packet.decode(encoding)
+			if len(out) >= max_chars:
+				break
+		self.client.send(stop_command)
+		self.client.expect(re_strings=self.client.prompt_regex)
+		self.client.encoding = previous_encoding
+		self.lock.release()
+		return out.replace(shell_command+'\r\n','')
 
 	def getprocserver(self):
 		'''This method returns a list with the names of the processes within the procserver manage-procs util'''
@@ -50,12 +70,18 @@ class Remote:
 			return self.services[name].stop(self)
 		elif command == 'status':
 			return self.services[name].status(self)
+		elif command == 'out':
+			return self.services[name].out(self)
 		else:
 			return False
 	
 	def stats(self):
 		out = self.execute('vmstat -S M').splitlines()[-1].split()
 		return {'cpu': out[-5], 'freemem': out[3] }
+	
+	def flush(self):
+		for _ in self.client.read():
+			pass
 	
 	def connect(self):
 		self.login(self.user, self.passw)

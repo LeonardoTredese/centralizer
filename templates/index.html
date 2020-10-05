@@ -27,7 +27,11 @@
 	  $(document).ready(function(){
 		
 		var api_base_url = 'http://127.0.0.1:5000'
-		
+	    
+		var load_shell_out = function(data, status){
+			$(this).children('p').children('.shell').text(data.out)
+		}
+
 		var load_sys_response = function(data, status){
 			$(this).children('.cpu').text(['CPU:', data.cpu, '%'].join(''))
 			$(this).children('.mem').text(['FREE MEM:', data.freemem, ' MB'].join(''))
@@ -56,10 +60,16 @@
 		 		$.get([api_base_url, $(this).attr('hostname'),  $(this).attr('servicename'), 'status'].join('/'),
 			       load_service_status.bind($(this)))
 			})
+			shellUpdate()
 		}
-
-		setInterval(poll,3000)
-
+		
+		function shellUpdate(){
+			$('.service').each(function(){
+		 		$.get([api_base_url, $(this).attr('hostname'),  $(this).attr('servicename'), 'out'].join('/'),
+			       load_shell_out.bind($(this)))
+			})
+		}
+		setInterval(poll,5000)
 	   })
 	  </script>
 	</head>
@@ -111,7 +121,10 @@
 			          		<div class="well service" hostname="{{ hostname }}" servicename="{{ service }}">
 			            		<h4>{{ service }}</h4>
 								<p>status: 
-									<b class="status"></b>
+									<span class="status"></span>
+								</p>
+								<p>shell out:
+									<span class="shell"></span>
 								</p>
 								<button type="button" class="btn btn-danger start-stop">stop</button>
 								<button type="button" class="btn btn-success start-stop">start</button>

@@ -20,19 +20,21 @@ def remotes():
 
 @app.route('/<remote_host>/<service_name>/<command>')
 def command(remote_host, service_name, command):
-	if command  in ['start', 'stop', 'status']:
+	if command  in ['start', 'stop', 'status', 'out']:
 		try:
 			return { command : remote_hosts[remote_host].interact(service_name,command)}
 		except BaseException as e:
 			print(e)
-	return { command : False}
+			return 'Internal Server Error', 500
+	return 'command not found', 404
 
 @app.route('/<remote_host>/sys')
 def system_remote_info(remote_host):
 	try:
 		return remote_hosts[remote_host].stats()
-	except BaseException:
-		return ''
+	except BaseException as e:
+		print(e)
+		return 'Internal Server Error', 500
 
 remote_hosts_args = [
 ##				('127.0.0.1','leonardo','', False)
@@ -40,6 +42,8 @@ remote_hosts_args = [
  			   ('10.6.0.75', 'root', 'e3password', False)
 			   ]
 remote_hosts = { arg[0]:Remote(*arg) for arg in remote_hosts_args }
+
+
 
 for host in remote_hosts:
 	reconnect(host)
