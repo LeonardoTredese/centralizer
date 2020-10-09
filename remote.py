@@ -42,8 +42,9 @@ class Remote:
 			out += packet.decode(encoding)
 			if len(out) >= max_chars:
 				break
-		self.client.send(stop_command)
-		self.client.expect(re_strings=self.client.prompt_regex)
+		if not re.search(self.client.prompt_regex, out):
+			self.client.send(stop_command)
+			self.client.expect(re_strings=self.client.prompt_regex)
 		self.client.encoding = previous_encoding
 		self.lock.release()
 		return out.replace(shell_command+'\r\n','')

@@ -37,9 +37,9 @@ def system_remote_info(remote_host):
 		return 'Internal Server Error', 500
 
 remote_hosts_args = [
-##				('127.0.0.1','leonardo','', False)
-               ('10.6.0.41', 'training', 'e3password', True),
- 			   ('10.6.0.75', 'root', 'e3password', False)
+#				('127.0.0.1','leonardo','', False)
+             ('10.6.0.41', 'training', 'e3password', True),
+ 		   ('10.6.0.75', 'root', 'e3password', False)
 			   ]
 remote_hosts = { arg[0]:Remote(*arg) for arg in remote_hosts_args }
 

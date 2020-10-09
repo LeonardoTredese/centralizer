@@ -30,7 +30,7 @@ class PodmanService(Service):
 		return remote.execute('podman ps -a --format "{{.Status}}" --sort names -f name=' + self.name).splitlines()[0]
 	
 	def out(self, remote):
-		return remote.shell_read('podman  attach --detach-keys="ctrl-a" '+ self.name, stop_command='\x01',encoding='latin1')
+		return remote.execute('podman logs --tail=20 '  + self.name)
 
 class ProcserverService(Service):
 	def start(self, remote):
@@ -43,4 +43,4 @@ class ProcserverService(Service):
 		return remote.execute('manage-procs status | grep ' + self.name).split()[1]
 
 	def out(self, remote):
-		return remote.shell_read('manage-procs attach t1', encoding='latin1') 
+		return remote.shell_read('manage-procs attach ' + self.name, encoding='latin1') 

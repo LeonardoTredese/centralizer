@@ -1,7 +1,7 @@
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-	  <title>Bootstrap Example</title>
+	  <title>Centralizer - Dashboard</title>
 	  <meta charset="utf-8">
 	  <meta name="viewport" content="width=device-width, initial-scale=1">
 	  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
@@ -29,7 +29,7 @@
 		var api_base_url = 'http://127.0.0.1:5000'
 	    
 		var load_shell_out = function(data, status){
-			$(this).children('p').children('.shell').text(data.out)
+			$(this).children('.shell').text(data.out)
 		}
 
 		var load_sys_response = function(data, status){
@@ -39,7 +39,7 @@
 		}
 
 		var load_service_status = function(data, status){
-					 $(this).children('p').children('.status').text(data.status)
+					 $(this).children('h4').children('.status').text(data.status)
 				}
 	  	
 	   	$('.start-stop').click(function(){
@@ -117,17 +117,13 @@
 			      	</div>
 			      	<div class="row">
 			      	{% for service in services %}
-			        	<div class="col-sm-3">
+			        	<div class="col-sm-6">
 			          		<div class="well service" hostname="{{ hostname }}" servicename="{{ service }}">
-			            		<h4>{{ service }}</h4>
-								<p>status: 
-									<span class="status"></span>
-								</p>
-								<p>shell out:
-									<span class="shell"></span>
-								</p>
+			            		<h4>{{ service }} | <span class="status"></span></h4>
 								<button type="button" class="btn btn-danger start-stop">stop</button>
-								<button type="button" class="btn btn-success start-stop">start</button>
+								<button type="button" class="btn btn-success start-stop">start</button><br/>
+								<label>Shell Out</label>
+							    <textarea class="form-control shell" readonly="readonly" rows="10"></textarea>
 					  		</div>
 			        	</div>
 			      	{% endfor %}
