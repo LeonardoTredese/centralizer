@@ -29,8 +29,7 @@ class Remote:
 		# delete carriage returns from command in prompt 
 		for i in range(len(command)//60, 0, -1):
 			out = out[:i*60] +  out[i*60+1:]
-		out = out.replace(command+'\n','').strip()
-		return out 
+		return out.replace(command+'\n','').strip()
 
 	def shell_read(self, shell_command, stop_command='\x04', encoding='UTF-8', max_chars=1000):
 		self.lock.acquire()
@@ -42,6 +41,7 @@ class Remote:
 			out += packet.decode(encoding)
 			if len(out) >= max_chars:
 				break
+		#if the  shell did not auto terminate
 		if not re.search(self.client.prompt_regex, out):
 			self.client.send(stop_command)
 			self.client.expect(re_strings=self.client.prompt_regex)

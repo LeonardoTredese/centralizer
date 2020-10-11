@@ -22,5 +22,8 @@ _build
 _static
 _templates
 
+# configuration files
+/configs
+
 # javascript
 package-lock.json
