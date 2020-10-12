@@ -4,7 +4,7 @@ from os.path import isfile, join
 
 
 
-def get_configuration(directory= "/home/leonardo/centralizer/configs"):
+def get_configuration(directory= "/usr/share/.centralizer/config/"):
 	parser = ConfigParser()
 	for configFile in listdir(directory):
 		configFile = join(directory, configFile)
