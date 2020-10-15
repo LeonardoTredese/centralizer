@@ -2,7 +2,7 @@ import re
 import time
 from redexpect            import RedExpect
 from redexpect.exceptions import ExpectTimeout 
-from service              import PodmanService, ProcserverService
+from service  import PodmanService, ProcserverService
 from threading            import Lock
 
 class Remote:

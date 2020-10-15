@@ -6,6 +6,7 @@ from os.path import isdir, expanduser, isfile, join
 
 def get_configuration(directory= expanduser("~/.centralizer/config/")):
     parser = ConfigParser()
+    print(directory)
     if not isdir(directory):
         print('[+] This is not a directory: ', directory)
         print('[+] Not importing anything')
