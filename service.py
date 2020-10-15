@@ -24,7 +24,7 @@ class PodmanService(Service):
 			int(out, 16)
 		except ValueError:
 			return False
-		return len(out) is 64
+		return len(out) == 64
 
 	def status(self, remote):
 		return remote.execute('podman ps -a --format "{{.Status}}" --sort names -f name=' + self.name).splitlines()[0]
@@ -34,10 +34,10 @@ class PodmanService(Service):
 
 class ProcserverService(Service):
 	def start(self, remote):
-		return remote.execute('manage-procs start ' + self.name) is ''
+		return remote.execute('manage-procs start ' + self.name) == ''
 	
 	def stop(self, remote):
-		return remote.execute('manage-procs stop ' + self.name) is ''
+		return remote.execute('manage-procs stop ' + self.name) == ''
 
 	def status(self, remote):
 		return remote.execute('manage-procs status | grep ' + self.name).split()[1]
