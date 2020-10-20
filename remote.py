@@ -83,19 +83,27 @@ class Remote:
 	def flush(self):
 		for _ in self.client.read():
 			pass
-	
 	def connect(self):
-		self.login(self.user, self.passw)
-		self.services = {**self.getpodman(), **self.getprocserver()}
-
+		outcome = self.login(self.user, self.passw)
+		if outcome :
+			self.services = {**self.getpodman(), **self.getprocserver()}
+		return outcome
+	
 	def check_command(self, command):
 		return self.execute('whereis ' + command) != command + ':'
-	
+
 	def login(self, username, password):
+		outcome = False
 		self.lock.acquire()
 		self.client.exit()
 		self.client = RedExpect()
-		self.client.login(hostname= self.host, username= username, password= password)
-		if self.use_sudo:
-			self.client.sudo(password)
-		self.lock.release()
+		try:
+			self.client.login(hostname= self.host, username= username, password= password, timeout=2)
+			if self.use_sudo:
+				self.client.sudo(password)
+			outcome = True
+		except ExpectTimout:
+			print('[+] Connection to ', self.host ,' timedout')
+		finally:
+			self.lock.release()
+			return outcome

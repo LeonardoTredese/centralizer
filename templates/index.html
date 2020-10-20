@@ -41,14 +41,21 @@
 		var load_service_status = function(data, status){
 					 $(this).children('h4').children('.status').text(data.status)
 				}
-	  	
-	   	$('.start-stop').click(function(){
+		$('.start-stop').click(function(){
 			$.get([api_base_url, $(this).parent().attr('hostname'),  $(this).parent().attr('servicename'), $(this).text()].join('/'))
 		})
 	
 		$('.reconnect').click(function(){
 			$(this).css("pointer-events","none").text("RECONNETING...")
-			$.get([api_base_url,$(this).parent().attr('id'),'reconnect'].join('/'), function(){$(this).css("pointer-events","auto").text("Reconnect")}.bind($(this)))	
+			$.get([api_base_url,$(this).parent().attr('id'),'reconnect'].join('/'), 
+				function(data){
+					$(this).css("pointer-events","auto")
+					if(data.status == 'connected'){
+						location.reload()
+					} else {
+						$(this).text("Failed, Reconnect?")
+					}
+				}.bind($(this)))	
 		})
 		
 		function poll(){

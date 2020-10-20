@@ -12,14 +12,12 @@ def startup():
     app.remote_hosts = { arg[0]:Remote(*arg[1:]) for arg in extract_args(get_configuration())}
     for host in app.remote_hosts:
         print('[+] Connecting to:', host)
-        reconnect(host)
-
+        print('[+] ', reconnect(host))
     
 
 @app.route('/<remote_host>/reconnect')
 def reconnect(remote_host):
-	app.remote_hosts[remote_host].connect()
-	return 'reconnected'
+	return { 'status' :'connected' if app.remote_hosts[remote_host].connect() else 'failed'}
 
 @app.route('/')
 def index():
@@ -42,7 +40,6 @@ def system_remote_info(remote_host):
 	except BaseException as e:
 		print(e)
 		return 'Internal Server Error', 500
-
 
 if __name__ == '__main__':
     app.run()
