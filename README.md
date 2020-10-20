@@ -17,7 +17,7 @@ inside the centralizer directory run:
 `podman build . -t centralizer`
 ### Run
 to run a non persistent container in the background run:
-`podman run --rm -d -v ${PATH_TO_YOUR_CONFIG_FILES}:/root/.centralizer/config/ -p 5000:80  --security-opt label=disable centralizer`
+``` podman run --rm -d -v ${PATH_TO_YOUR_CONFIG_FILES}:/root/.centralizer/config/ -p 5000:80  --security-opt label=disable centralizer```
 and to run a non persistent interactive container run:
-`podman run --rm -it -v ${PATH_TO_YOUR_CONFIG_FILES}:/root/.centralizer/config/ -p 5000:80  --security-opt label=disable centralizer`
-and connect to it [http://127.0.0.1/5000][http://127.0.0.1/5000]
+``` podman run --rm -it -v ${PATH_TO_YOUR_CONFIG_FILES}:/root/.centralizer/config/ -p 5000:80  --security-opt label=disable centralizer```
+and connect to it: http://127.0.0.1/5000
