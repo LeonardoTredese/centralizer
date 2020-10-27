@@ -6,7 +6,7 @@ class Service:
     '''
     def __init__(self, name):
         '''Basic initializer with the services name'''
-	self.name= name
+        self.name= name
 
     def start(self, remote):
         '''Starts the service
@@ -17,7 +17,7 @@ class Service:
             Returns:
                 the outcome of the operation as a boolean
         '''
-	pass
+        pass
 
     def stop(self, remote):
         '''Stops the service
@@ -39,7 +39,7 @@ class Service:
             Returns:
                 the status of the operation in form of a string
 	'''
-	pass
+        pass
 
     def out(self, remote):
         '''Gets some lines of the output of the Service 
@@ -50,27 +50,27 @@ class Service:
             Returns:
                 a string rapresenting some line of the service output
         '''
-	pass
+        pass
 
 class PodmanService(Service):
     '''An implementation of Service class specific to control podman containers
     '''
     def start(self, remote):
         '''See Service'''
-	return self.name in remote.execute('podman start ' + self.name)
+        return self.name in remote.execute('podman start ' + self.name)
 
     def stop(self, remote):
         '''See Service'''
-	out = remote.execute('podman stop ' + self.name) 
-	try:
-	    int(out, 16)
-	except ValueError:
-	    return False
-	return len(out) == 64
+        out = remote.execute('podman stop ' + self.name) 
+        try:
+            int(out, 16)
+        except ValueError:
+            return False
+        return len(out) == 64
 
     def status(self, remote):
         '''See Service'''
-	return remote.execute('podman ps -a --format "{{.Status}}" --sort names -f name=' + self.name).splitlines()[0]
+        return remote.execute('podman ps -a --format "{{.Status}}" --sort names -f name=' + self.name).splitlines()[0]
 	
     def out(self, remote):
         '''See Service
@@ -84,15 +84,15 @@ class ProcserverService(Service):
     '''
     def start(self, remote):
         '''See Service'''
-	return remote.execute('manage-procs start ' + self.name) == ''
+        return remote.execute('manage-procs start ' + self.name) == ''
     
     def stop(self, remote):
         '''See Service'''
-	return remote.execute('manage-procs stop ' + self.name) == ''
+        return remote.execute('manage-procs stop ' + self.name) == ''
 
     def status(self, remote):
         '''See Service'''
-	return remote.execute('manage-procs status | grep ' + self.name).split()[1]
+        return remote.execute('manage-procs status | grep ' + self.name).split()[1]
 
     def out(self, remote):
         '''See Service
@@ -100,4 +100,4 @@ class ProcserverService(Service):
             The output comes directly from the shell, so if the shell does not output anything 
             it will be empty
         '''
-	return remote.shell_read('manage-procs attach ' + self.name, encoding='latin1') 
+        return remote.shell_read('manage-procs attach ' + self.name, encoding='latin1') 
