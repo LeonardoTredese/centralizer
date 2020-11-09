@@ -26,7 +26,7 @@
 	  <script>
 	  $(document).ready(function(){
 		
-		var api_base_url = 'http://127.0.0.1:5000'
+		var api_base_url = document.location.origin
 	    
 		var load_shell_out = function(data, status){
 			$(this).children('.shell').text(data.out)
